@@ -1,21 +1,42 @@
 import pygame
+import math
 
 HEIGHT = 480
 WIDTH = 800
 HEIGHT_PRINCESS = 60
 WIDTH_PRINCESS = 28
 
+DOWN = 1
+
 n = 10
 height = []
+treasure = []
 rect_width = 80
 
 random = 0
 
+
+world = pygame.Rect((0, 0), (WIDTH, HEIGHT))
+world_image = pygame.Surface((WIDTH, HEIGHT), depth = 24)
+princess = pygame.Rect((0, HEIGHT / 2), (WIDTH_PRINCESS, HEIGHT_PRINCESS))
+
+clock = pygame.time.Clock()
+screen = pygame.display.set_mode(world.size)
+
+screen = pygame.display.set_mode(world.size)
+background = pygame.image.load("img/background/back1.png").convert()
+
+princess_image = pygame.image.load("img/princess/2.png").convert()
+block = pygame.image.load("img/blocks/block.png").convert()
+treasure_image = pygame.image.load("img/blocks/treasure.png").convert()
+
+
 def initHeights():
     from random import randint
     for i in range(0, n):
-        height.append(randint(100, 300))
-        print height[i]
+        height.append(randint(1, 3) * 80)
+        treasure.append(randint(0, 1))
+       # print str(height[i]) + " " + str(treasure[i])
     return
     
 
@@ -23,22 +44,31 @@ def init():
     initHeights()
     return
 
+def draw_blocks():
+    for i in range(0, n):
+        nr = height[i] / 80
+        for j in range(0, nr):
+            world_image.blit(block, (80 * i, HEIGHT - 80 * (j + 1)))
+        if treasure[i] == 1:
+            world_image.blit(treasure_image, (80 * i, HEIGHT - 80 * nr))
+            #pygame.draw.rect(screen, pygame.Color('red'), (i * rect_width, HEIGHT - height[i], rect_width, height[i]))
+    return
+
+
+def ok(directie):
+    if directie == DOWN:
+        current_block = int(math.floor(princess.right / 80))
+        print current_block
+        print str(princess.bottom) + " " + str(HEIGHT-height[current_block])
+        if princess.bottom < HEIGHT - height[current_block]:
+            return True 
+    return False
+
+
 
 def main():
 
     init()
-
-    world = pygame.Rect((0, 0), (WIDTH, HEIGHT))
-    world_image = pygame.Surface((WIDTH, HEIGHT), depth = 24)
-    princess = pygame.Rect((0, HEIGHT / 2), (WIDTH_PRINCESS, HEIGHT_PRINCESS))
-    
-    clock = pygame.time.Clock()
-    screen = pygame.display.set_mode(world.size)
-
-    screen = pygame.display.set_mode(world.size)
-    background = pygame.image.load("img/background/back1.png").convert()
-
-    princess_image = pygame.image.load("img/princess/2.png").convert()
     
     #princess_image = princess_image
 
@@ -61,7 +91,8 @@ def main():
 
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_DOWN]:
-            princess.move_ip(0, 20)
+            if ok(DOWN) == True:
+                princess.move_ip(0, 20)
         if pressed[pygame.K_UP]:
             princess.move_ip(0, -20)
         if pressed[pygame.K_RIGHT]:
@@ -79,12 +110,10 @@ def main():
 
 
         world_image.set_alpha(128) 
-
         world_image.blit(background, (0, 0))
-        world_image.blit(princess_image, princess.center)
-        screen.blit(world_image, (0, 0))    
-        for i in range(0, n):
-            pygame.draw.rect(screen, pygame.Color('red'), (i * rect_width, HEIGHT - height[i], rect_width, height[i]))
+        world_image.blit(princess_image, (princess.left, princess.top))   
+        draw_blocks()
+        screen.blit(world_image, (0, 0)) 
         pygame.display.flip()
         clock.tick (30)
     return
