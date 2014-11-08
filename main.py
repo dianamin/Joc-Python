@@ -15,7 +15,7 @@ def main():
     screen = pygame.display.set_mode(world.size)
     princess_image = pygame.image.load("img/princess/2.png").convert()
     background = pygame.image.load("img/background/back1.png").convert()
-
+ 
     vx = 10;
 
     while True:
@@ -24,7 +24,16 @@ def main():
                 if event.key == pygame.K_ESCAPE:
                     return
 
-        princess.move_ip(vx, 0)
+        pressed = pygame.key.get_pressed()
+        if pressed[pygame.K_DOWN]:
+            princess.move_ip(0, 10)
+        if pressed[pygame.K_UP]:
+            princess.move_ip(0, -10)
+        if pressed[pygame.K_RIGHT]:
+            princess.move_ip(10, 0)
+        if pressed[pygame.K_LEFT]:
+            princess.move_ip(-10, 0)
+
         princess.clamp_ip(world)
 
 
