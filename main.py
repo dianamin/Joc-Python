@@ -8,7 +8,8 @@ WIDTH_PRINCESS = 28
 
 DOWN = 1
 
-n = 10
+n = 100
+
 height = []
 treasure = []
 rect_width = 80
@@ -37,6 +38,7 @@ def initHeights():
         height.append(randint(1, 3) * 80)
         treasure.append(randint(0, 1))
        # print str(height[i]) + " " + str(treasure[i])
+    height.append(0)
     return
     
 
@@ -44,22 +46,21 @@ def init():
     initHeights()
     return
 
-def draw_blocks():
-    for i in range(0, n):
+def draw_blocks(first_block):
+    for i in range(first_block, n):
         nr = height[i] / 80
         for j in range(0, nr):
-            world_image.blit(block, (80 * i, HEIGHT - 80 * (j + 1)))
+            world_image.blit(block, (80 * (i - first_block), HEIGHT - 80 * (j + 1)))
         if treasure[i] == 1:
-            world_image.blit(treasure_image, (80 * i, HEIGHT - 80 * nr))
+            world_image.blit(treasure_image, (80 * (i - first_block), HEIGHT - 80 * nr))
             #pygame.draw.rect(screen, pygame.Color('red'), (i * rect_width, HEIGHT - height[i], rect_width, height[i]))
     return
 
 
-def ok(directie):
+def ok(directie, first_block):
     if directie == DOWN:
-        current_block = int(math.floor(princess.right / 80))
+        current_block = int(math.floor(princess.right / 80) + first_block)
         print current_block
-        print str(princess.bottom) + " " + str(HEIGHT-height[current_block])
         if princess.bottom < HEIGHT - height[current_block]:
             return True 
     return False
@@ -80,9 +81,9 @@ def main():
     #             pixdata[x, y] = (255, 255, 255, 0)
 
     # princess_image = princess_image.convert()
-
-    vx = 10;
-
+    x = 0
+    vx = 10
+    first_block = 0
     while True:
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -91,7 +92,7 @@ def main():
 
         pressed = pygame.key.get_pressed()
         if pressed[pygame.K_DOWN]:
-            if ok(DOWN) == True:
+            if ok(DOWN, first_block) == True:
                 princess.move_ip(0, 20)
         if pressed[pygame.K_UP]:
             princess.move_ip(0, -20)
@@ -111,8 +112,12 @@ def main():
 
         world_image.set_alpha(128) 
         world_image.blit(background, (0, 0))
-        world_image.blit(princess_image, (princess.left, princess.top))   
-        draw_blocks()
+        world_image.blit(princess_image, (princess.left, princess.top))
+        x += 1
+        if x == 40:
+            first_block += 1
+            x = 0
+        draw_blocks(first_block)
         screen.blit(world_image, (0, 0)) 
         pygame.display.flip()
         clock.tick (30)
