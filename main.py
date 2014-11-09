@@ -26,7 +26,7 @@ score = 0
 
 world = pygame.Rect((0, 0), (WIDTH, HEIGHT))
 world_image = pygame.Surface((WIDTH, HEIGHT), depth = 24)
-princess = pygame.Rect((0, HEIGHT / 2), (WIDTH_PRINCESS, HEIGHT_PRINCESS))
+princess = pygame.Rect((0, 0), (WIDTH_PRINCESS, HEIGHT_PRINCESS))
 
 clock = pygame.time.Clock()
 screen = pygame.display.set_mode(world.size)
@@ -105,7 +105,6 @@ def draw_blocks(first_block):
             world_image.blit(treasure_image, (80 * (i - first_block), HEIGHT - 80 * nr))
         if monster[i] == 1:
             world_image.blit(monster_image, (80 * (i - first_block), HEIGHT - 80 * nr))
-            #pygame.draw.rect(screen, pygame.Color('red'), (i * rect_width, HEIGHT - height[i], rect_width, height[i]))
     return
 
 def show_life():
@@ -125,7 +124,7 @@ def main():
     first_block = 0
     jumping = False
     jumped = 0
-    falling = False
+    falling = True
     jumping_speed = 20
 
     screen.blit(begin, (0, 0))
