@@ -1,5 +1,6 @@
 import pygame
 import math
+import time
 
 
 HEIGHT = 480
@@ -42,22 +43,20 @@ monster_image = pygame.image.load("img/monster/monster.png").convert()
 treasure_image = pygame.image.load("img/blocks/treasure.png").convert()
 heart_image = pygame.image.load("img/hearts/heart.png").convert()
 
+begin = pygame.image.load("img/other/begin.png").convert()
+end = pygame.image.load("img/other/end.png").convert()
 
-def initHeights():
+done = False
+
+def init():
     from random import randint
     for i in range(0, n):
         height.append(randint(1, 3) * 80)
         treasure.append(randint(0, 1))
         monster.append(randint(0, 6 ))
-       # print str(height[i]) + " " + str(treasure[i])
     height.append(0)
+    monster[0] = 0
     return
-    
-
-def init():
-    initHeights()
-    return
-
 
 def ok(directie, first_block):
     current_block = int(math.floor(princess.right / 80) + first_block)
@@ -67,9 +66,10 @@ def ok(directie, first_block):
         monster[current_block] = 0
         global heart
         heart -= 1
+        if heart == 0:
+            done = True
         return False
     if directie == DOWN:
-       # print current_block
         if princess.bottom < HEIGHT - height[current_block]:
             return True 
         return False
@@ -119,16 +119,7 @@ def main():
     init()
     pygame.font.init()
     font = pygame.font.SysFont(pygame.font.get_default_font(), 28)
-    #princess_image = princess_image
-
-    # pixdata = princess_image.load()
-
-    # for y in xrange(princess_image.size[1]):
-    #     for x in xrange(princess_image.size[0]):
-    #         if pixdata[x, y] == (255, 255, 255, 255):
-    #             pixdata[x, y] = (255, 255, 255, 0)
-
-    # princess_image = princess_image.convert()
+    
     x = 0
     vx = 10
     first_block = 0
@@ -137,7 +128,11 @@ def main():
     falling = False
     jumping_speed = 20
 
-    while True:
+    screen.blit(begin, (0, 0))
+    pygame.display.flip()
+    time.sleep(3)
+    global done
+    while done == False:
         princess_image = princess_image_front
         for event in pygame.event.get():
             if event.type == pygame.KEYDOWN:
@@ -166,22 +161,13 @@ def main():
         if jumping == True:
             princess.move_ip(0, -jumping_speed)
             jumped += jumping_speed
-            print jumped
         if jumped == 140:
             falling = True
             jumping = False
         if falling == True and jumping == False:
             if (ok(DOWN, first_block)):
                 princess.move_ip(0, jumping_speed)
-                print jumped
                 jumped -= jumping_speed
-            
-
-        #key = (0,255,0)
-        #world_image.fill(world_image.get_rect(), key)
-        #world_image.set_colorkey(key)
-        #world_image.blit(image, (0,0))
-
 
         world_image.set_alpha(128) 
         world_image.blit(background, (0, 0))
@@ -192,12 +178,22 @@ def main():
             x = 0
         draw_blocks(first_block)
         screen.blit(world_image, (0, 0))
-
+        if first_block == 90:
+            done = True
         text = font.render("score: %d" % score, True, pygame.Color('black'))
         screen.blit(text, (0, 0))
         show_life()
         pygame.display.flip()
         clock.tick (30)
+        global heart
+        if heart == 0:
+            done = True
+
+    text = font.render("score: %d" % score, True, pygame.Color('black'))
+    screen.blit(end, (0,0))
+    screen.blit(text, (0, 0))
+    pygame.display.flip()
+    time.sleep(3)
     return
 
 main()
